@@ -1,2 +1,2 @@
-# yp_de_workshops
-Проект предназначен для проведения workshops в YP на курсt DE
+# de_workshops_yp
+Проект предназначен для проведения workshops в Яндекс.Практикум на курсе DE

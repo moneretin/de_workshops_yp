@@ -1,0 +1,1 @@
+ALTER TABLE staff ADD COLUMN system varchar(100);
