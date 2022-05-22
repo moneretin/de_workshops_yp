@@ -1,6 +1,6 @@
-# Инструкция по запуску docker-compose
+# Flyway with docker
 
-## 1. Поднимаем docker-compose
+## Работа с docker-compose
 
 Для этого выполним команду (флаг -d означает запуск в фоновом режиме):
 ```bash
