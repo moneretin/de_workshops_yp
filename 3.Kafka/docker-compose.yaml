@@ -1,0 +1,97 @@
+---
+version: '3'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.0.1
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - ./zoo/data:/var/lib/zookeeper/data
+      - ./zoo/log:/var/lib/zookeeper/log
+
+  broker:
+    image: confluentinc/cp-kafka:7.0.1
+    hostname: broker
+    container_name: broker
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    volumes:
+      - ./broker/data:/var/lib/kafka/data
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.0.1
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'broker:29092'
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+    depends_on:
+      - zookeeper
+      - broker
+    ports:
+      - '8081:8081'
+#  kafka-connect:
+#    image: cnfldemos/cp-server-connect-datagen:0.5.3-7.1.0
+#    container_name: kafka-connect
+#    depends_on:
+#      - broker
+#    ports:
+#      - "8083:8083"
+#    environment:
+#      CONNECT_BOOTSTRAP_SERVERS: 'broker:29092'
+#      CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connect
+#      CONNECT_GROUP_ID: kafka-connect-group
+#      CONNECT_CONFIG_STORAGE_TOPIC: connect-configs
+#      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+#      CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
+#      CONNECT_OFFSET_STORAGE_TOPIC: connect-offsets
+#      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+#      CONNECT_STATUS_STORAGE_TOPIC: connect-status
+#      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+#      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+#      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+#      AWS_ACCESS_KEY: minioadmin
+#      AWS_SECRET_KEY: minioadmin
+#      CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+#      CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+#      CONNECT_INTERNAL_KEY_CONVERTER_SCHEMAS_ENABLE: 'false'
+#      CONNECT_INTERNAL_VALUE_CONVERTER_SCHEMAS_ENABLE: 'false'
+#      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      # CLASSPATH required due to CC-2422
+#      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-7.2.0.jar
+#      CONNECT_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
+#      CONNECT_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
+#      CONNECT_PLUGIN_PATH: "/usr/share/java,/usr/share/confluent-hub-components"
+#      CONNECT_LOG4J_LOGGERS: org.apache.zookeeper=ERROR,org.I0Itec.zkclient=ERROR,org.reflections=ERROR
+
+#  minio:
+#    image: quay.io/minio/minio:RELEASE.2022-05-19T18-20-59Z
+#    hostname: minio
+#    command: server /data --console-address ":9001"
+#    ports:
+#      - "9000:9000"
+#      - "9001:9001"
+#    environment:
+#      MINIO_ROOT_USER: minioadmin
+#      MINIO_ROOT_PASSWORD: minioadmin
+#    healthcheck:
+#      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+#      interval: 30s
+#      timeout: 20s
+#      retries: 3
+#    volumes:
+#      - minio_data:/data
+#
+#volumes:
+#  minio_data:

@@ -2,7 +2,7 @@
 
 ## 1. Запускаем MinIO с помощью docker-compose
 
-Для этого перейдем директорию 2.Airflow_and_S3:
+Для этого перейдем в директорию 2.Airflow_and_S3:
 ```bash
 cd 2.Airflow_and_S3
 ```
@@ -93,7 +93,7 @@ docker-compose -f docker-compose.yaml -f minio/docker-compose.yaml -p practicum 
 
 Создать виртуальную среду:
 ```bash
-python -m venv .env/
+python -m venv .env
 ```
 
 Активировать виртуальную среду:
